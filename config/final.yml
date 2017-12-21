@@ -1,1 +1,5 @@
 name: java
+blobstore:
+  provider: local
+  options:
+    blobstore_path: /tmp/java-blobs
