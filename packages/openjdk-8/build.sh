@@ -4,16 +4,17 @@ set -e -x -u -o pipefail
 
 major_ver=8
 update_ver=172
-build_number=00
+build_number=03
 
 # http://hg.openjdk.java.net/jdk8u/jdk8u/tags
+# (note that tags on this page are not sorted)
 tag=jdk${major_ver}u${update_ver}-b${build_number}
 
 echo "----> Setting up dev env"
 apt-get -y update
 apt-get -y install openjdk-8-jdk mercurial build-essential zip \
   libx11-dev libxext-dev libxrender-dev libxtst-dev libxt-dev \
-  libcups2-dev libfreetype6-dev libasound2-dev libelf-dev
+  libcups2-dev libfreetype6-dev libasound2-dev libelf-dev cpio
 
 echo "----> Creating CA certs bundle"
 mkdir -p cacerts/
@@ -34,6 +35,13 @@ pushd jdk8u
   ./common/bin/hgforest.sh checkout $tag
 popd
 
+echo "----> Configure freetype"
+pushd jdk8u
+  mkdir freetype && \
+    ln -s /usr/include/freetype2 freetype/include && \
+    ln -s /usr/lib/x86_64-linux-gnu/ freetype/lib
+popd
+
 echo "----> Building OpenJDK 8"
 pushd jdk8u
   unset JAVA_HOME
@@ -45,6 +53,7 @@ pushd jdk8u
     --with-build-number=$build_number \
     --with-cacerts-file=$(pwd)/../cacerts.jks \
     --with-milestone=fcs \
+    --with-freetype=./freetype \
     --with-update-version=$update_ver
   COMPANY_NAME="github.com/bosh-packages/java-release" make images
   chmod -R a+r build/linux-x86_64-normal-server-release/images
@@ -59,3 +68,4 @@ mkdir output/
 mv openjdk-jdk.tar.gz output/${tag}-jdk.tar.gz
 mv openjdk.tar.gz     output/${tag}.tar.gz
 shasum -a 256 output/*.tar.gz > output/shasums
+cat output/shasums

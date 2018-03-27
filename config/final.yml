@@ -1,5 +1,5 @@
 name: java
 blobstore:
-  provider: local
+  provider: s3
   options:
-    blobstore_path: /tmp/java-blobs
+    bucket_name: bosh-packages-java-release

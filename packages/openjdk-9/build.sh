@@ -4,8 +4,8 @@ set -e -x -u -o pipefail
 
 major_ver=9
 minor_ver=0
-update_ver=1
-build_number=11
+update_ver=4
+build_number=12
 
 # http://hg.openjdk.java.net/jdk-updates/jdk9u/tags
 tag=jdk-${major_ver}.${minor_ver}.${update_ver}+${build_number}
@@ -58,3 +58,4 @@ mkdir output/
 mv openjdk-jdk.tar.gz output/${tag}-jdk.tar.gz
 mv openjdk.tar.gz     output/${tag}.tar.gz
 shasum -a 256 output/*.tar.gz > output/shasums
+cat output/shasums
